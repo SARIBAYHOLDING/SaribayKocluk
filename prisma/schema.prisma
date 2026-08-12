@@ -1,0 +1,143 @@
+// Prisma schema for Sarıbay Özel Koçluk Sistemi
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+}
+
+model User {
+  id        String    @id @default(cuid())
+  name      String
+  email     String    @unique
+  password  String?
+  role      String    @default("TEACHER")
+  image     String?
+  students  Student[]
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+}
+
+model Student {
+  id                   String          @id @default(cuid())
+  name                 String
+  surname              String
+  grade                String          // e.g. "12. Sınıf", "8. Sınıf", "Mezun"
+  targetExam           String          // e.g. "YKS (SAY)", "YKS (EA)", "LGS", "KPSS"
+  schoolName           String?
+  phone                String?
+  parentName           String?
+  parentPhone          String?
+  status               String          @default("ACTIVE") // ACTIVE, INACTIVE, COMPLETED
+  pricingType          String          @default("MONTHLY") // MONTHLY, HOURLY, PER_SESSION
+  pricingAmount        Float           @default(0.0)
+  targetWeeklyQuestions Int            @default(500)
+  notes                String?
+  userId               String?
+  user                 User?           @relation(fields: [userId], references: [id], onDelete: SetNull)
+  topicProgress        TopicProgress[]
+  testLogs             TestLog[]
+  books                Book[]
+  payments             Payment[]
+  createdAt            DateTime        @default(now())
+  updatedAt            DateTime        @updatedAt
+}
+
+model Subject {
+  id        String    @id @default(cuid())
+  name      String    @unique // e.g. "Matematik", "Fizik", "Türkçe"
+  code      String    // e.g. "MAT", "FIZ", "TRK"
+  color     String    @default("#3b82f6") // hex code for UI charts
+  topics    Topic[]
+  testLogs  TestLog[]
+  createdAt DateTime  @default(now())
+}
+
+model Topic {
+  id            String          @id @default(cuid())
+  subjectId     String
+  subject       Subject         @relation(fields: [subjectId], references: [id], onDelete: Cascade)
+  unitName      String          // e.g. "Fonksiyonlar", "Elektrik ve Magnetizma"
+  topicName     String          // e.g. "Ters Fonksiyon", "Ohm Kanunu"
+  order         Int             @default(0)
+  targetHours   Float           @default(2.0)
+  topicProgress TopicProgress[]
+  createdAt     DateTime        @default(now())
+}
+
+model TopicProgress {
+  id                   String   @id @default(cuid())
+  studentId            String
+  student              Student  @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  topicId              String
+  topic                Topic    @relation(fields: [topicId], references: [id], onDelete: Cascade)
+  status               String   @default("NOT_STARTED") // NOT_STARTED, IN_PROGRESS, COMPLETED, REVISION_NEEDED
+  studyDurationMinutes Int      @default(0)
+  notes                String?
+  completedAt          DateTime?
+  updatedAt            DateTime @updatedAt
+
+  @@unique([studentId, topicId])
+}
+
+model TestLog {
+  id             String   @id @default(cuid())
+  studentId      String
+  student        Student  @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  subjectId      String
+  subject        Subject  @relation(fields: [subjectId], references: [id], onDelete: Cascade)
+  topicName      String?
+  sourceBook     String?  // e.g. "3D Yayınları TYT Mat", "Bilgi Sarmal"
+  testDate       DateTime @default(now())
+  totalQuestions Int
+  correct        Int
+  incorrect      Int
+  blank          Int
+  net            Float    // Calculated as correct - (incorrect / 4.0)
+  targetNet      Float?
+  notes          String?
+  createdAt      DateTime @default(now())
+}
+
+model Book {
+  id          String       @id @default(cuid())
+  studentId   String
+  student     Student      @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  title       String
+  author      String
+  totalPages  Int
+  status      String       @default("READING") // READING, COMPLETED, PAUSED
+  startDate   DateTime     @default(now())
+  endDate     DateTime?
+  logs        ReadingLog[]
+  notes       String?
+  createdAt   DateTime     @default(now())
+}
+
+model ReadingLog {
+  id           String   @id @default(cuid())
+  bookId       String
+  book         Book     @relation(fields: [bookId], references: [id], onDelete: Cascade)
+  logDate      DateTime @default(now())
+  pagesRead    Int
+  startPage    Int
+  endPage      Int
+  studentNotes String?
+  createdAt    DateTime @default(now())
+}
+
+model Payment {
+  id           String    @id @default(cuid())
+  studentId    String
+  student      Student   @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  amount       Float
+  status       String    @default("PENDING") // PAID, PENDING, OVERDUE, PARTIAL
+  paymentMethod String?  // EFT, CASH, CREDIT_CARD
+  pricingModel String    @default("MONTHLY") // MONTHLY, HOURLY, PER_SESSION
+  dueDate      DateTime
+  paidDate     DateTime?
+  invoiceNote  String?
+  createdAt    DateTime  @default(now())
+}

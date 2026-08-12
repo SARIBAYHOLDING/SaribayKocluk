@@ -1,14 +1,19 @@
 import { PrismaClient } from '@prisma/client'
-import { PrismaBetterSqlite3 } from '@prisma/adapter-better-sqlite3'
 
 const globalForPrisma = globalThis as unknown as {
   prisma: PrismaClient | undefined
 }
 
 function createPrismaClient() {
-  const url = process.env.DATABASE_URL || 'file:./dev.db'
-  const adapter = new PrismaBetterSqlite3({ url })
-  return new PrismaClient({ adapter })
+  try {
+    const url = process.env.DATABASE_URL || 'file:./dev.db'
+    const { PrismaBetterSqlite3 } = require('@prisma/adapter-better-sqlite3')
+    const adapter = new PrismaBetterSqlite3({ url })
+    return new PrismaClient({ adapter })
+  } catch (err) {
+    console.warn('Prisma sqlite adapter fallback:', err)
+    return new PrismaClient()
+  }
 }
 
 export const prisma = globalForPrisma.prisma ?? createPrismaClient()

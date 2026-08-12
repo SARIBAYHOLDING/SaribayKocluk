@@ -3,6 +3,7 @@
 import React, { useState } from 'react'
 import { Plus, MessageCircle, Calendar, Sparkles } from 'lucide-react'
 import { SupportModal } from '@/components/common/SupportModal'
+import { LogoutButton } from '@/components/auth/AuthGuard'
 
 interface HeaderProps {
   title?: string
@@ -71,6 +72,9 @@ export function Header({
               <MessageCircle className="w-4 h-4" />
               <span className="hidden md:inline">WhatsApp</span>
             </a>
+
+            {/* Logout Button */}
+            <LogoutButton />
 
             {/* Quick Action Button Dropdown */}
             <div className="relative">

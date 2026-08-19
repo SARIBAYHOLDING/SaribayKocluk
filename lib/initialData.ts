@@ -86,6 +86,22 @@ export interface PaymentData {
   invoiceNote?: string;
 }
 
+export interface ScheduleItemData {
+  id: string;
+  studentId: string;
+  dayOfWeek: 'Pazartesi' | 'Salı' | 'Çarşamba' | 'Perşembe' | 'Cuma' | 'Cumartesi' | 'Pazar';
+  timeSlot?: string;
+  subjectId: string;
+  topicName?: string;
+  targetQuestions?: number;
+  durationMinutes?: number;
+  completed: boolean;
+  priority?: 'HIGH' | 'MEDIUM' | 'LOW';
+  notes?: string;
+  createdAt: string;
+}
+
+
 export const INITIAL_SUBJECTS: SubjectData[] = [
   { id: 'subj-mat', name: 'Matematik', code: 'MAT', color: '#3b82f6' },
   { id: 'subj-fiz', name: 'Fizik', code: 'FIZ', color: '#8b5cf6' },
@@ -431,3 +447,166 @@ export const INITIAL_PAYMENTS: PaymentData[] = [
     invoiceNote: '2 Seans Ücreti Alındı, Kalan 1 Seans Beklemede.',
   },
 ];
+
+export const INITIAL_SCHEDULE_ITEMS: ScheduleItemData[] = [
+  // Zeynep (std-1) YKS SAY Programı
+  {
+    id: 'sch-1',
+    studentId: 'std-1',
+    dayOfWeek: 'Pazartesi',
+    timeSlot: '09:00 - 11:30',
+    subjectId: 'subj-mat',
+    topicName: 'Türev ve İntegral Giriş',
+    targetQuestions: 80,
+    durationMinutes: 150,
+    completed: true,
+    priority: 'HIGH',
+    notes: '3D Yayınlarından 4 test bitirilecek.',
+    createdAt: '2026-08-15T08:00:00.000Z',
+  },
+  {
+    id: 'sch-2',
+    studentId: 'std-1',
+    dayOfWeek: 'Pazartesi',
+    timeSlot: '14:00 - 16:00',
+    subjectId: 'subj-fiz',
+    topicName: 'Elektriksel Alan ve Potansiyel',
+    targetQuestions: 50,
+    durationMinutes: 120,
+    completed: true,
+    priority: 'MEDIUM',
+    notes: 'Formüller tekrar edilecek.',
+    createdAt: '2026-08-15T08:00:00.000Z',
+  },
+  {
+    id: 'sch-3',
+    studentId: 'std-1',
+    dayOfWeek: 'Salı',
+    timeSlot: '10:00 - 12:00',
+    subjectId: 'subj-kim',
+    topicName: 'Kimyasal Denge ve KÇÇ',
+    targetQuestions: 60,
+    durationMinutes: 120,
+    completed: false,
+    priority: 'HIGH',
+    notes: 'ÖSYM çıkmış sorular taranacak.',
+    createdAt: '2026-08-15T08:00:00.000Z',
+  },
+  {
+    id: 'sch-4',
+    studentId: 'std-1',
+    dayOfWeek: 'Çarşamba',
+    timeSlot: '09:30 - 12:00',
+    subjectId: 'subj-mat',
+    topicName: 'AYT Trigonometri Karma',
+    targetQuestions: 75,
+    durationMinutes: 150,
+    completed: false,
+    priority: 'HIGH',
+    notes: 'Toplam-fark ve yarım açı soru kalıpları.',
+    createdAt: '2026-08-15T08:00:00.000Z',
+  },
+  {
+    id: 'sch-5',
+    studentId: 'std-1',
+    dayOfWeek: 'Perşembe',
+    timeSlot: '14:00 - 16:30',
+    subjectId: 'subj-biy',
+    topicName: 'Bitki Biyolojisi ve Fotosentez',
+    targetQuestions: 60,
+    durationMinutes: 150,
+    completed: false,
+    priority: 'MEDIUM',
+    notes: 'Şemalar üzerinden özet çıkarılacak.',
+    createdAt: '2026-08-15T08:00:00.000Z',
+  },
+  {
+    id: 'sch-6',
+    studentId: 'std-1',
+    dayOfWeek: 'Cuma',
+    timeSlot: '10:00 - 13:00',
+    subjectId: 'subj-mat',
+    topicName: 'Genel AYT Matematik Denemesi',
+    targetQuestions: 40,
+    durationMinutes: 180,
+    completed: false,
+    priority: 'HIGH',
+    notes: 'Süre kısıtlamalı tam deneme çözümü.',
+    createdAt: '2026-08-15T08:00:00.000Z',
+  },
+  {
+    id: 'sch-7',
+    studentId: 'std-1',
+    dayOfWeek: 'Cumartesi',
+    timeSlot: '11:00 - 13:00',
+    subjectId: 'subj-trk',
+    topicName: 'Paragraf Hız Kampı + TYT Türkçe',
+    targetQuestions: 50,
+    durationMinutes: 120,
+    completed: false,
+    priority: 'LOW',
+    notes: 'Yanlış soruların soru analizi yapılacak.',
+    createdAt: '2026-08-15T08:00:00.000Z',
+  },
+  {
+    id: 'sch-8',
+    studentId: 'std-1',
+    dayOfWeek: 'Pazar',
+    timeSlot: '15:00 - 17:00',
+    subjectId: 'subj-fiz',
+    topicName: 'Modern Fizik & Radyoaktivite',
+    targetQuestions: 45,
+    durationMinutes: 120,
+    completed: false,
+    priority: 'MEDIUM',
+    notes: 'Haftalık genel tekrar ve eksik kapatma.',
+    createdAt: '2026-08-15T08:00:00.000Z',
+  },
+
+  // Emre (std-2) YKS EA Programı
+  {
+    id: 'sch-9',
+    studentId: 'std-2',
+    dayOfWeek: 'Pazartesi',
+    timeSlot: '09:00 - 11:00',
+    subjectId: 'subj-trk',
+    topicName: 'Paragraf ve Anlam Bilgisi',
+    targetQuestions: 50,
+    durationMinutes: 120,
+    completed: true,
+    priority: 'HIGH',
+    notes: 'Süre tutularak 40 soru çözülecek.',
+    createdAt: '2026-08-15T08:00:00.000Z',
+  },
+  {
+    id: 'sch-10',
+    studentId: 'std-2',
+    dayOfWeek: 'Salı',
+    timeSlot: '13:00 - 15:30',
+    subjectId: 'subj-tar',
+    topicName: 'Milli Mücadele Dönemi',
+    targetQuestions: 60,
+    durationMinutes: 150,
+    completed: false,
+    priority: 'HIGH',
+    notes: 'Kongreler ve cepheler kronolojisi çıkarılacak.',
+    createdAt: '2026-08-15T08:00:00.000Z',
+  },
+
+  // Elif (std-3) LGS Programı
+  {
+    id: 'sch-11',
+    studentId: 'std-3',
+    dayOfWeek: 'Pazartesi',
+    timeSlot: '16:00 - 18:00',
+    subjectId: 'subj-mat',
+    topicName: 'LGS Çarpanlar Katlar & Üslü İfadeler',
+    targetQuestions: 40,
+    durationMinutes: 120,
+    completed: true,
+    priority: 'HIGH',
+    notes: 'Yeni nesil MEB örnek soruları.',
+    createdAt: '2026-08-15T08:00:00.000Z',
+  },
+];
+

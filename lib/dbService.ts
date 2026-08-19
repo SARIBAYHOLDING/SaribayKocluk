@@ -6,12 +6,14 @@ import {
   INITIAL_BOOKS,
   INITIAL_READING_LOGS,
   INITIAL_PAYMENTS,
+  INITIAL_SCHEDULE_ITEMS,
   StudentData,
   SubjectData,
   TestLogData,
   BookData,
   ReadingLogData,
   PaymentData,
+  ScheduleItemData,
 } from './initialData'
 
 export async function getStudents(): Promise<StudentData[]> {
@@ -368,7 +370,7 @@ export async function createPayment(data: Omit<PaymentData, 'id'>): Promise<Paym
         pricingModel: data.pricingModel,
         dueDate: new Date(data.dueDate),
         paidDate: data.paidDate ? new Date(data.paidDate) : null,
-        invoiceNote: data.invoiceNote,
+        invoiceNote: '2 Seans Ücreti Alındı, Kalan 1 Seans Beklemede.',
       },
     })
     return {
@@ -392,3 +394,32 @@ export async function createPayment(data: Omit<PaymentData, 'id'>): Promise<Paym
     return newPay
   }
 }
+
+export async function getScheduleItems(studentId?: string): Promise<ScheduleItemData[]> {
+  try {
+    const items = await (prisma as any).scheduleItem.findMany({
+      where: studentId ? { studentId } : undefined,
+      orderBy: { createdAt: 'desc' },
+    })
+    if (items.length > 0) {
+      return items.map((i: any) => ({
+        id: i.id,
+        studentId: i.studentId,
+        dayOfWeek: i.dayOfWeek as any,
+        timeSlot: i.timeSlot || undefined,
+        subjectId: i.subjectId || '',
+        topicName: i.topicName || undefined,
+        targetQuestions: i.targetQuestions || 0,
+        durationMinutes: i.durationMinutes || 60,
+        completed: i.completed,
+        priority: (i.priority as any) || 'MEDIUM',
+        notes: i.notes || undefined,
+        createdAt: i.createdAt ? i.createdAt.toISOString() : new Date().toISOString(),
+      }))
+    }
+  } catch (err) {
+    console.warn('Prisma getScheduleItems fallback:', err)
+  }
+  return studentId ? INITIAL_SCHEDULE_ITEMS.filter((i) => i.studentId === studentId) : INITIAL_SCHEDULE_ITEMS
+}
+

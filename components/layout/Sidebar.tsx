@@ -16,6 +16,7 @@ import {
   ChevronRight,
   GraduationCap,
   Menu,
+  Calendar,
   X,
 } from 'lucide-react'
 import { clsx } from 'clsx'
@@ -24,6 +25,7 @@ import { SupportModal } from '@/components/common/SupportModal'
 const NAV_ITEMS = [
   { label: 'Genel Bakış', href: '/dashboard', icon: LayoutDashboard },
   { label: 'Öğrenci Takibi', href: '/dashboard/students', icon: Users },
+  { label: 'Çalışma Programı', href: '/dashboard/schedule', icon: Calendar },
   { label: 'Test & Net Takibi', href: '/dashboard/tests', icon: FileText },
   { label: 'Kitap Okuma', href: '/dashboard/books', icon: BookMarked },
   { label: 'Ödeme & Finans', href: '/dashboard/payments', icon: CreditCard },

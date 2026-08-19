@@ -10,6 +10,7 @@ import {
   BookOpen,
   ArrowRight,
   Sparkles,
+  Calendar,
 } from 'lucide-react'
 import Link from 'next/link'
 import { Header } from '@/components/layout/Header'
@@ -20,12 +21,13 @@ import { StatusBadge } from '@/components/common/StatusBadge'
 import { NewStudentModal } from '@/components/students/NewStudentModal'
 import { LogTestModal } from '@/components/tests/LogTestModal'
 import { AddPaymentModal } from '@/components/payments/AddPaymentModal'
-import { StudentData, SubjectData, TestLogData, PaymentData, BookData } from '@/lib/initialData'
+import { StudentData, SubjectData, TestLogData, PaymentData, BookData, ScheduleItemData } from '@/lib/initialData'
 import {
   getStoredStudents,
   getStoredTestLogs,
   getStoredBooks,
   getStoredPayments,
+  getStoredScheduleItems,
   getStorageData,
 } from '@/lib/storage'
 
@@ -35,6 +37,7 @@ export default function OverviewDashboardPage() {
   const [testLogs, setTestLogs] = useState<TestLogData[]>([])
   const [payments, setPayments] = useState<PaymentData[]>([])
   const [books, setBooks] = useState<BookData[]>([])
+  const [scheduleItems, setScheduleItems] = useState<ScheduleItemData[]>([])
 
   const [isStudentModalOpen, setIsStudentModalOpen] = useState(false)
   const [isTestModalOpen, setIsTestModalOpen] = useState(false)
@@ -47,6 +50,7 @@ export default function OverviewDashboardPage() {
     setTestLogs(getStoredTestLogs())
     setBooks(getStoredBooks())
     setPayments(getStoredPayments())
+    setScheduleItems(getStoredScheduleItems())
   }
 
   useEffect(() => {

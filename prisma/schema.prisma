@@ -41,18 +41,20 @@ model Student {
   testLogs             TestLog[]
   books                Book[]
   payments             Payment[]
+  scheduleItems        ScheduleItem[]
   createdAt            DateTime        @default(now())
   updatedAt            DateTime        @updatedAt
 }
 
 model Subject {
-  id        String    @id @default(cuid())
-  name      String    @unique // e.g. "Matematik", "Fizik", "Türkçe"
-  code      String    // e.g. "MAT", "FIZ", "TRK"
-  color     String    @default("#3b82f6") // hex code for UI charts
-  topics    Topic[]
-  testLogs  TestLog[]
-  createdAt DateTime  @default(now())
+  id            String         @id @default(cuid())
+  name          String         @unique // e.g. "Matematik", "Fizik", "Türkçe"
+  code          String         // e.g. "MAT", "FIZ", "TRK"
+  color         String         @default("#3b82f6") // hex code for UI charts
+  topics        Topic[]
+  testLogs      TestLog[]
+  scheduleItems ScheduleItem[]
+  createdAt     DateTime       @default(now())
 }
 
 model Topic {
@@ -141,3 +143,21 @@ model Payment {
   invoiceNote  String?
   createdAt    DateTime  @default(now())
 }
+
+model ScheduleItem {
+  id              String   @id @default(cuid())
+  studentId       String
+  student         Student  @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  dayOfWeek       String   // Pazartesi, Salı, Çarşamba, Perşembe, Cuma, Cumartesi, Pazar
+  timeSlot        String?  // e.g. "09:00 - 11:00" or "Sabah Oturumu"
+  subjectId       String?
+  subject         Subject? @relation(fields: [subjectId], references: [id], onDelete: SetNull)
+  topicName       String?
+  targetQuestions Int?     @default(0)
+  durationMinutes Int?     @default(60)
+  completed       Boolean  @default(false)
+  priority        String?  @default("MEDIUM") // HIGH, MEDIUM, LOW
+  notes           String?
+  createdAt       DateTime @default(now())
+}
+

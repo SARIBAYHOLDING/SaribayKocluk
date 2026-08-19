@@ -1,8 +1,9 @@
 'use client'
 
 import React from 'react'
-import { Printer, GraduationCap, Award, BookOpen, CheckCircle, PhoneCall, ShieldCheck } from 'lucide-react'
+import { Printer, GraduationCap, Award, BookOpen, CheckCircle, PhoneCall, ShieldCheck, Calendar } from 'lucide-react'
 import { StudentData, TestLogData, BookData, PaymentData, SubjectData } from '@/lib/initialData'
+import { getStoredScheduleItems } from '@/lib/storage'
 
 interface ParentReportViewProps {
   student: StudentData
@@ -32,6 +33,9 @@ export function ParentReportView({
 
   const studentBooks = books.filter((b) => b.studentId === student.id)
   const studentPayments = payments.filter((p) => p.studentId === student.id)
+  const studentSchedule = getStoredScheduleItems(student.id)
+  const totalScheduleHours = (studentSchedule.reduce((acc, i) => acc + (i.durationMinutes || 60), 0) / 60).toFixed(1)
+  const completedScheduleCount = studentSchedule.filter((i) => i.completed).length
 
   const reportDate = new Date().toLocaleDateString('tr-TR', {
     day: 'numeric',
@@ -195,6 +199,26 @@ export function ParentReportView({
           ) : (
             <p className="text-xs text-slate-500 italic">Henüz aktif kitap okuma kaydı bulunmuyor.</p>
           )}
+        </div>
+
+        {/* Weekly Study Schedule Summary */}
+        <div>
+          <h3 className="text-sm font-black text-slate-900 uppercase tracking-wider mb-3 flex items-center gap-2">
+            <Calendar className="w-4 h-4 text-indigo-600" />
+            3. Haftalık Çalışma Programı & Soru Hedefleri
+          </h3>
+
+          <div className="p-4 rounded-xl bg-slate-50 border border-slate-200 text-xs space-y-2">
+            <div className="flex justify-between font-bold text-slate-900">
+              <span>Toplam Planlanan Çalışma Süresi: {totalScheduleHours} Saat</span>
+              <span className="text-indigo-700">
+                Tamamlanan Oturum: {completedScheduleCount} / {studentSchedule.length}
+              </span>
+            </div>
+            <div className="text-slate-600">
+              Haftalık Hedef Soru Sayısı: <strong className="text-slate-900">{student.targetWeeklyQuestions} Soru/Hafta</strong>
+            </div>
+          </div>
         </div>
 
         {/* Coach Evaluation Note */}

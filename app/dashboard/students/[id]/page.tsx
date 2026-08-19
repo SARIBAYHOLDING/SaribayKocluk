@@ -23,6 +23,7 @@ import {
   Award,
   Clock,
   Sparkles,
+  Calendar,
 } from 'lucide-react'
 import { Header } from '@/components/layout/Header'
 import { StatusBadge } from '@/components/common/StatusBadge'
@@ -38,6 +39,7 @@ import {
   PaymentData,
   SubjectData,
   TaskData,
+  ScheduleItemData,
 } from '@/lib/initialData'
 import {
   getStoredStudents,
@@ -45,6 +47,8 @@ import {
   getStoredBooks,
   getStoredPayments,
   getStoredTasks,
+  getStoredScheduleItems,
+  toggleScheduleItem,
   getStorageData,
   deleteTestLog,
   deletePayment,
@@ -63,10 +67,11 @@ export default function StudentDetailPage() {
   const [books, setBooks] = useState<BookData[]>([])
   const [payments, setPayments] = useState<PaymentData[]>([])
   const [tasks, setTasks] = useState<TaskData[]>([])
+  const [scheduleItems, setScheduleItems] = useState<ScheduleItemData[]>([])
   const [subjects, setSubjects] = useState<SubjectData[]>([])
   const [coachNotes, setCoachNotes] = useState('')
 
-  const [activeTab, setActiveTab] = useState<'overview' | 'tasks' | 'tests' | 'books' | 'payments' | 'report'>('overview')
+  const [activeTab, setActiveTab] = useState<'overview' | 'schedule' | 'tasks' | 'tests' | 'books' | 'payments' | 'report'>('overview')
 
   const [isTestModalOpen, setIsTestModalOpen] = useState(false)
   const [isEditModalOpen, setIsEditModalOpen] = useState(false)
@@ -86,6 +91,7 @@ export default function StudentDetailPage() {
     setBooks(getStoredBooks(studentId))
     setPayments(getStoredPayments(studentId))
     setTasks(getStoredTasks(studentId))
+    setScheduleItems(getStoredScheduleItems(studentId))
   }
 
   useEffect(() => {
@@ -117,6 +123,11 @@ export default function StudentDetailPage() {
 
   const handleToggleTaskItem = (id: string) => {
     toggleTask(id)
+    loadStudentData()
+  }
+
+  const handleToggleScheduleItem = (id: string) => {
+    toggleScheduleItem(id)
     loadStudentData()
   }
 
@@ -251,6 +262,17 @@ export default function StudentDetailPage() {
           Genel Özet
         </button>
         <button
+          onClick={() => setActiveTab('schedule')}
+          className={`px-4 py-2.5 rounded-xl transition-all flex items-center gap-1.5 ${
+            activeTab === 'schedule'
+              ? 'bg-indigo-600 text-white shadow-md'
+              : 'text-slate-500 hover:text-slate-900 dark:hover:text-white'
+          }`}
+        >
+          <Calendar className="w-4 h-4" />
+          <span>Çalışma Programı ({scheduleItems.length})</span>
+        </button>
+        <button
           onClick={() => setActiveTab('tasks')}
           className={`px-4 py-2.5 rounded-xl transition-all flex items-center gap-1.5 ${
             activeTab === 'tasks'
@@ -358,6 +380,103 @@ export default function StudentDetailPage() {
               placeholder="Öğrencinin haftalık gelişimi, zayıf/güçlü yönleri ve koçluk tavsiyelerinizi buraya yazın..."
               className="w-full p-3 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-xs font-medium focus:outline-none focus:ring-2 focus:ring-indigo-500"
             />
+          </div>
+        </div>
+      )}
+
+      {/* Tab: Study Schedule */}
+      {activeTab === 'schedule' && (
+        <div className="rounded-2xl bg-white dark:bg-slate-900 p-6 shadow-sm border border-slate-200/80 dark:border-slate-800 space-y-4">
+          <div className="flex items-center justify-between">
+            <div>
+              <h3 className="text-base font-bold text-slate-900 dark:text-white">
+                Haftalık Ders & Konu Çalışma Programı
+              </h3>
+              <p className="text-xs text-slate-500">
+                {student.name} için tanımlanmış 7 günlük ders çalışma programı ve soru hedefleri
+              </p>
+            </div>
+
+            <Link
+              href="/dashboard/schedule"
+              className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-indigo-600 text-white font-bold text-xs shadow-md hover:bg-indigo-700 transition-all"
+            >
+              <Calendar className="w-4 h-4" />
+              <span>Program Yönetimi / Düzenle</span>
+            </Link>
+          </div>
+
+          <div className="space-y-3 pt-2">
+            {scheduleItems.length === 0 ? (
+              <div className="p-8 text-center text-slate-400 text-xs border border-dashed border-slate-200 dark:border-slate-800 rounded-2xl space-y-3">
+                <p>Bu öğrenciye henüz çalışma programı tanımlanmamış.</p>
+                <Link
+                  href="/dashboard/schedule"
+                  className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-purple-600 text-white font-bold text-xs shadow-md"
+                >
+                  <Sparkles className="w-4 h-4" />
+                  <span>Hazır Şablon Yükle veya Ders Ekle</span>
+                </Link>
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 text-xs">
+                {scheduleItems.map((item) => {
+                  const subj = subjects.find((s) => s.id === item.subjectId)
+                  return (
+                    <div
+                      key={item.id}
+                      onClick={() => handleToggleScheduleItem(item.id)}
+                      className={`cursor-pointer p-4 rounded-xl border transition-all flex items-start justify-between gap-3 ${
+                        item.completed
+                          ? 'bg-slate-50 dark:bg-slate-800/40 border-slate-200 dark:border-slate-800 opacity-75'
+                          : 'bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-700 shadow-sm hover:border-indigo-500'
+                      }`}
+                    >
+                      <div className="space-y-1">
+                        <div className="flex items-center gap-2">
+                          <span className="font-black text-slate-900 dark:text-white">
+                            {item.dayOfWeek}
+                          </span>
+                          <span className="text-[10px] text-slate-400 font-semibold">
+                            {item.timeSlot || 'Oturum'}
+                          </span>
+                        </div>
+
+                        <div className="flex items-center gap-1.5">
+                          <span
+                            className="px-2 py-0.5 rounded text-[10px] text-white font-bold"
+                            style={{ backgroundColor: subj?.color || '#3b82f6' }}
+                          >
+                            {subj?.name || 'Ders'}
+                          </span>
+                          <span className="font-bold text-slate-800 dark:text-slate-200">
+                            {item.topicName || 'Konu Çalışması'}
+                          </span>
+                        </div>
+
+                        {item.targetQuestions ? (
+                          <div className="text-[11px] font-bold text-indigo-600 dark:text-indigo-400">
+                            Hedef: {item.targetQuestions} Soru
+                          </div>
+                        ) : null}
+
+                        {item.notes && (
+                          <div className="text-[10px] text-slate-400 italic">"{item.notes}"</div>
+                        )}
+                      </div>
+
+                      <button className="focus:outline-none">
+                        {item.completed ? (
+                          <CheckCircle2 className="w-5 h-5 text-emerald-500 shrink-0" />
+                        ) : (
+                          <Circle className="w-5 h-5 text-slate-300 dark:text-slate-600 shrink-0" />
+                        )}
+                      </button>
+                    </div>
+                  )
+                })}
+              </div>
+            )}
           </div>
         </div>
       )}

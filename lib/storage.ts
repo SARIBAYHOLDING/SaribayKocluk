@@ -308,6 +308,50 @@ export function deleteScheduleItem(id: string): boolean {
   return data.scheduleItems.length < initialLength
 }
 
+export function updateScheduleItem(
+  id: string,
+  updates: Partial<ScheduleItemData>
+): ScheduleItemData | null {
+  const data = getStorageData()
+  const items = data.scheduleItems || []
+  const index = items.findIndex((i) => i.id === id)
+  if (index === -1) return null
+
+  items[index] = { ...items[index], ...updates }
+  saveStorageData(data)
+  return items[index]
+}
+
+export function duplicateScheduleItem(id: string): ScheduleItemData | null {
+  const data = getStorageData()
+  const item = (data.scheduleItems || []).find((i) => i.id === id)
+  if (!item) return null
+
+  const newItem: ScheduleItemData = {
+    ...item,
+    id: `sch-${Date.now()}-${Math.floor(Math.random() * 1000)}`,
+    completed: false,
+    createdAt: new Date().toISOString(),
+  }
+  if (!data.scheduleItems) data.scheduleItems = []
+  data.scheduleItems.unshift(newItem)
+  saveStorageData(data)
+  return newItem
+}
+
+export function clearStudentSchedule(studentId: string, dayOfWeek?: string): number {
+  const data = getStorageData()
+  const initialLength = (data.scheduleItems || []).length
+  data.scheduleItems = (data.scheduleItems || []).filter((i) => {
+    if (studentId !== 'ALL' && i.studentId !== studentId) return true
+    if (dayOfWeek && dayOfWeek !== 'ALL') return i.dayOfWeek !== dayOfWeek
+    return false
+  })
+  const removedCount = initialLength - data.scheduleItems.length
+  saveStorageData(data)
+  return removedCount
+}
+
 export function applyPresetSchedule(
   studentId: string,
   presetType: 'YKS_SAY' | 'YKS_EA' | 'LGS' | 'KPSS'
